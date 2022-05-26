@@ -60,6 +60,8 @@ public class PlayerMovement : MonoBehaviour
 
     //our increase in speed for sliding also know as a DELTA
     public float slideInc;
+
+    public float AirSlideSpeed;
     
     private void Start()
     {
@@ -98,7 +100,7 @@ public class PlayerMovement : MonoBehaviour
         Move(MoveX, MoveY);
     }
 
-    
+     
     private void Move(float x, float y)
     { 
         
@@ -156,13 +158,17 @@ public class PlayerMovement : MonoBehaviour
 
     void EndJump()
     {
-        if (isSlide == true)
+        if (!isGrounded)
         {
-            rb.velocity = new Vector3(rb.velocity.x / InAirSpeed, rb.velocity.y, rb.velocity.z / InAirSpeed);
+            rb.velocity = new Vector3(rb.velocity.x / InAirSpeed * Multiplier, rb.velocity.y, rb.velocity.z / InAirSpeed);
+        }
+        if (isGrounded == false && isSlide == true)
+        {
+            rb.velocity = new Vector3(rb.velocity.x / AirSlideSpeed * Multiplier, rb.velocity.y, rb.velocity.z / AirSlideSpeed);
         }
         else
         {
-            rb.velocity = new Vector3(rb.velocity.x / InAirSpeed, rb.velocity.y, rb.velocity.z / InAirSpeed);
+            rb.velocity = new Vector3(rb.velocity.x, rb.velocity.y, rb.velocity.z);
         }
        
     }
@@ -170,7 +176,7 @@ public class PlayerMovement : MonoBehaviour
     void StartCrouch()
     {
         isSlide = true;
-        maxSpeed = Mathf.MoveTowards(maxSpeed, slidingSpeed, slideInc);
+        maxSpeed = slidingSpeed;
         crouchScale = new Vector3(0.5f, 0.3f, 0.5f);
     }
 
