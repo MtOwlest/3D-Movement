@@ -3,6 +3,7 @@
 using System;
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -18,21 +19,20 @@ public class PlayerMovement : MonoBehaviour
     float mouseX;
 
     //Used for the Look() Method
-    float XRotation = 0;
+    public float XRotation = 0;
 
     //i think its used?
     float x;
     float y;
 
     //Transforms for the player, camera, and the orientation.
-    public Transform Camera;
+    public Transform _Camera;
     public Transform orientation;
     public Transform player;
-    public Transform groundCollider;
 
     //Sensitivity and the rotation of the Y-Axis
     public float MSens;
-    float YRotation = 0;
+    public float YRotation = 0;
 
     //Movement speeds
     public float moveSpeed;
@@ -73,17 +73,26 @@ public class PlayerMovement : MonoBehaviour
 
     //default air sprint speed
     public float AirSprintSpeed;
-    
+
     //the true max speed to reset it back to
     public float trueMaxSpeed;
 
     //our sprint speed
     public float maxsprint;
 
+    //fovs for our camera
+    public float normFOV = 60.0f;
+    public float sprintFOV;
+    public float crouchFOV;
+
+
+
 
     //first frame where we initialize things
     private void Start()
     {
+
+        Camera.main.fieldOfView = normFOV;
 
         //setting our scale to our default
         crouchScale = new Vector3(0.5f, 0.5f, 0.5f);
@@ -91,6 +100,7 @@ public class PlayerMovement : MonoBehaviour
         //make our local scale = to the crouch scale
         player.localScale += crouchScale;
         
+
         //making our variable = to our rigidbody
         rb = this.GetComponent<Rigidbody>();
 
@@ -179,6 +189,7 @@ public class PlayerMovement : MonoBehaviour
             //setting our current speed to our pre-defined sprint speed and showing we are sprinting with isSprint
             moveSpeed = sprintSpeed;
             isSprint = true;
+            Camera.main.fieldOfView = sprintFOV;
         }
         //if not then movespeed is = to our true speed and were not sprinting
         else
@@ -187,6 +198,7 @@ public class PlayerMovement : MonoBehaviour
             moveSpeed = trueMaxSpeed;
             //sprinting is no longer.
             isSprint = false;
+            Camera.main.fieldOfView = normFOV;
         }
     }
 
@@ -216,11 +228,11 @@ public class PlayerMovement : MonoBehaviour
             {
                 rb.velocity = new Vector3(rb.velocity.x / 2, rb.velocity.y, rb.velocity.z / 2);
             }
-            
-            
+
+
         }
-       
-        
+
+
     }
 
 
@@ -239,7 +251,7 @@ public class PlayerMovement : MonoBehaviour
             //adding our default jump power
             rb.AddForce(JumpForce);
         }
-        
+
 
     }
 
@@ -274,8 +286,8 @@ public class PlayerMovement : MonoBehaviour
         maxSpeed = slidingSpeed;
         crouchScale = new Vector3(0.5f, 0.3f, 0.5f);
 
-        //not used for rn
-        posChange = new Vector3(0, 0.3f, 0);
+        Camera.main.fieldOfView = crouchFOV;
+        
     }
 
 
@@ -286,6 +298,7 @@ public class PlayerMovement : MonoBehaviour
         isSlide = false;
         maxSpeed = maxTrueSpeed;
         crouchScale = new Vector3(0.5f, 0.5f, 0.5f);
+        Camera.main.fieldOfView = normFOV;
     }
 
     //this is a pretty basic look fucntion, and is definatly the thing im least happy with,
@@ -304,11 +317,9 @@ public class PlayerMovement : MonoBehaviour
         XRotation = Mathf.Clamp(XRotation, -90f, 90f);
 
         //quaternions make me go die ong. but we set our cameras rotation = to our mousex and y variables, then roate it, then change orientation so we can move in that direction
-        Camera.localRotation = Quaternion.Euler(XRotation, YRotation, 0f);
-        Camera.Rotate(Vector3.up * mouseX);
+        _Camera.localRotation = Quaternion.Euler(XRotation, YRotation, 0f);
         orientation.localRotation = Quaternion.Euler(0, YRotation, 0);
     }
-
 
     //if we collide with an object
     private void OnCollisionEnter(Collision collision)
